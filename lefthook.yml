@@ -6,10 +6,10 @@ pre-commit:
       run: poetry run black --check {staged_files}
     flake8:
       glob: "*.py"
-      run: poetry run flake8 --check {staged_files}
+      run: poetry run flake8 {staged_files}
     mypy:
       glob: "*.py"
-      run: poetry run mypy --check {staged_files}
+      run: poetry run mypy {staged_files}
     isort:
       glob: "*.py"
       run: poetry run isort --check {staged_files}
