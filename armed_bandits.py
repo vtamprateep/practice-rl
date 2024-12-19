@@ -77,7 +77,7 @@ class ArmedBandits:
         max_reward: Union[int, float],
         std: Union[int, float],
     ) -> None:
-        """Sets populates an entry in self.arms for the number of arms desired. Each entry
+        """Populates an entry in self.arms for the number of arms desired. Each entry
         is a function that returns a value of a pull of that arm given some mean and standard
         deviation value.
         """
@@ -85,6 +85,44 @@ class ArmedBandits:
             mean = random.uniform(min_reward, max_reward)
             LOG.info(f"Creating arm with mean {mean} and std {std}.")
             self.arms[i] = Arm(mean, std)
+
+
+class ActionRewardFunctionTabular:
+    """Given a reward, returns expected value. Method here is just averaging the rewards seen
+    for a state.
+    """
+
+    class ExpectedActionReward:
+        """Tracks the reward and the updating of the reward given an action."""
+
+        def __init__(self) -> None:
+            self.sample_population = 0
+            self.expected_reward = 0.0
+
+        def get_reward(self) -> float:
+            """Returns current expected reward."""
+            return self.expected_reward
+
+        def update_reward(self, observed_reward: float) -> None:
+            """Update expected reward based on observed reward."""
+            numerator = self.expected_reward * self.sample_population + observed_reward
+            denominator = self.sample_population + 1
+            self.expected_reward = numerator / denominator
+            self.sample_population += 1
+
+    def __init__(self, action_set: set[int]) -> None:
+        self.action_reward_table = {
+            action: self.ExpectedActionReward() for action in action_set
+        }
+
+    def predict_reward(self, action: int) -> float:
+        if action not in self.action_reward_table:
+            raise KeyError("Key not found in action reward table.")
+
+        return self.action_reward_table[action].get_reward()
+
+    def update_table(self, action: int, observed_reward: float) -> None:
+        self.action_reward_table[action].update_reward(observed_reward)
 
 
 if __name__ == "__main__":
