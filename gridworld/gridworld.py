@@ -1,10 +1,10 @@
-import json
 import logging
-import pathlib
 import random
 from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Union
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
@@ -35,14 +35,7 @@ class GridWorldSim:
 
     Assumes grid world is a valid rectangle of sorts."""
 
-    def __init__(self, path_to_world: str):
-        self.world_schema = None
-        self.world_height = None
-        self.world_width = None
-
-        self.start = None
-        self.end = None
-
+    def __init__(self, path_to_world: Union[str, Path]):
         # Load world schema, determine height and width
         with open(path_to_world, "r") as fp:
             self.world_schema = eval("".join(fp.readlines()))
@@ -151,10 +144,9 @@ class GridWorldAgent:
                     best_move = move
 
         # Add explore randomness to go left or right of the desired movement, execute movement
-        alternate_move = None
         if best_move in (Action.UP, Action.DOWN):
             alternate_move = random.choice([Action.LEFT, Action.RIGHT])
-        elif best_move in (Action.LEFT, Action.RIGHT):
+        else:
             alternate_move = random.choice([Action.UP, Action.DOWN])
 
         next_move = best_move
@@ -214,7 +206,7 @@ class GridWorldAgent:
 
 
 if __name__ == "__main__":
-    path_to_world = pathlib.Path("./gridworld/world/world_1.txt")
+    path_to_world = Path("./gridworld/world/world_1.txt")
     world_sim = GridWorldSim(path_to_world)
     gridworld_agent = GridWorldAgent(world_sim)
     gridworld_agent.run_simulation()
