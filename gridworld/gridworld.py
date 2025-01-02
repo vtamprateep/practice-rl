@@ -192,9 +192,7 @@ class GridWorldAgent:
             height = max(height, state.position[0] + 1)
             width = max(width, state.position[1] + 1)
 
-        print(height, width)
         state_table_array = [[0] * width for _ in range(height)]
-        print(state_table_array)
         for state, value in self.v_value_table.items():
             state_table_array[state.position[0]][state.position[1]] = "{:2.2f}".format(
                 value
